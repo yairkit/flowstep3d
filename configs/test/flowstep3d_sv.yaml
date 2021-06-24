@@ -1,0 +1,88 @@
+train: False
+
+model_params:
+  model_name: 'flowstep3d'
+  npoint: 8192
+  loc_flow_nn: 18
+  loc_flow_rad: 1.5
+  k_decay_fact: 0.5
+
+exp_params:
+  disable_plots: True
+  batch_size: 8
+  num_workers: 32
+  test_iters: 5
+  data:
+    overfit_samples: null
+    train_dataset: null
+    train_data_root: null
+    test_dataset: kitti
+    test_data_root: data/datasets
+    num_points: 8192
+    full: False
+    allow_less_points: False
+
+    data_process:
+      DEPTH_THRESHOLD: 35.
+      NO_CORR: True
+      IND_DIR: null
+
+    data_augmentation:
+      aug_together:
+        degree_range: 0.1745329252
+        shift_range: 1.
+        scale_low: 0.95
+        scale_high: 1.05
+        jitter_sigma: 0.01
+        jitter_clip: 0.00
+      aug_pc2:
+        degree_range: 0.
+        deg_max: True
+        shift_range: 0.3
+        xy_shift_range: 0.
+        jitter_sigma: 0.01
+        jitter_clip: 0.00
+      val_aug_pc2: null
+
+
+  loss:
+    loss_type: 'unsup_l1'
+    w_data: [0.75]
+    w_smoothness: [0.25]
+    smoothness_loss_params:
+      w_knn: 3.
+      w_ball_q: 1.
+      knn_loss_params:
+        k: 16
+        radius: 0.5
+        loss_norm: 1
+      ball_q_loss_params:
+        k: 64
+        radius: 1.5
+        loss_norm: 1
+    chamfer_loss_params:
+      loss_norm: 2
+      k: 1
+  optimizer:
+    lr: 0.008
+  scheduler:
+     milestones: [50]
+     gamma: 0.1
+
+trainer_params:
+  distributed_backend: 'ddp'
+  num_nodes: 1
+  gpus: 2
+  max_epochs: 80
+  num_sanity_val_steps: 3
+  check_val_every_n_epoch: 1
+  # resume_from_checkpoint: 'checkpoints/flowstep3d_sv/2020-10-16_01-10/epoch=87.ckpt' # sv (baseline)
+  resume_from_checkpoint: 'checkpoints/flowstep3d_sv/2020-10-19_13-17/epoch=33.ckpt' # sv (ft) *** BEST 0.054 KITTI ***
+
+logging_params:
+  offline_mode: True
+  api_key: None  # keep None if NEPTUNE_API_TOKEN environment variable is set
+  project_name: '' # set your NEPTUNE project name
+  exp_name: 'test_flowstep3d_sv'
+  tags: ['test_mode', 'FlowStep3D']
+  ckpt_dir: 'checkpoints/flowstep3d_sv'

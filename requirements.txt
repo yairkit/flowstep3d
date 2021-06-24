@@ -1,0 +1,7 @@
+PyJWT==1.7.1
+numpy==1.19.1
+scipy==1.0.0
+pytorch-lightning==0.9.0
+torch==1.6.0
+neptune-client==0.4.119
+pypng==0.0.20

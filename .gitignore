@@ -1,0 +1,10 @@
+venv
+.idea
+__pycache__/
+.vscode
+checkpoints/*
+data/datasets/*
+lib/pointnet2/__pycache__
+lib/pointnet2/build
+lib/pointnet2/dist
+lib/pointnet2/pointnet2.egg-info

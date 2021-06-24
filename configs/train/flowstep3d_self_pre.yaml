@@ -1,0 +1,92 @@
+train: True
+
+model_params:
+  model_name: 'flowstep3d'
+  npoint: 8192
+  use_insrance_norm: False
+  loc_flow_nn: 16
+  loc_flow_rad: 1.5
+  k_decay_fact: 1.0
+
+exp_params:
+  disable_plots: True
+  batch_size: 2
+  num_workers: 32
+  train_iters: 4
+  val_iters: 4
+  loss_iters_w: [0.8, 0.2, 0.4, 0.6]
+  
+  data:
+    overfit_samples: null
+    train_dataset: flyingthings3d
+    train_data_root: data/datasets
+    test_dataset: null
+    test_data_root: null
+    num_points: 8192
+    full: False
+    allow_less_points: False
+
+    data_process:
+      DEPTH_THRESHOLD: 35.
+      NO_CORR: True
+      IND_DIR: null
+
+    data_augmentation:
+      aug_together:
+        degree_range: 0.1745329252
+        shift_range: 1.
+        scale_low: 0.95
+        scale_high: 1.05
+        jitter_sigma: 0.01
+        jitter_clip: 0.00
+      aug_pc2:
+        degree_range: 0.
+        xy_shift_range: 0.
+        deg_max: False
+        shift_range: 0.2
+        jitter_sigma: 0.01
+        jitter_clip: 0.00
+      val_aug_pc2: null
+
+  loss:
+    loss_type: 'unsup_l1'
+    w_data: [0.75, 0.75, 0.75, 0.75]
+    w_smoothness: [0.25, 0.25, 0.25, 0.25]
+    smoothness_loss_params:
+      w_knn: 3.
+      w_ball_q: 1.
+      knn_loss_params:
+        k: 16
+        radius: 0.25
+        loss_norm: 1
+      ball_q_loss_params:
+        k: 64
+        radius: 0.75
+        loss_norm: 1
+    chamfer_loss_params:
+      loss_norm: 2
+      k: 1
+  optimizer:
+    lr: 0.002
+  scheduler:
+     milestones: [50, 70]
+     gamma: 0.5
+
+trainer_params:
+  deterministic: False # slower. reproduce.
+  distributed_backend: 'ddp'
+  num_nodes: 1
+  gpus: 8
+  max_epochs: 80
+  num_sanity_val_steps: 3
+  check_val_every_n_epoch: 1
+  resume_from_checkpoint: null
+  sync_batchnorm: True
+
+logging_params:
+  offline_mode: True
+  api_key: None  # keep None if NEPTUNE_API_TOKEN environment variable is set
+  project_name: '' # set your NEPTUNE project name
+  exp_name: 'flowstep3d_self'
+  tags: ['train_mode', 'FlowStep3D', 'self', 'pre']
+  ckpt_dir: 'checkpoints/flowstep3d_self'
